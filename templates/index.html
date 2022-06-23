@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <form action="{{ url_for('broadcast_tx_route') }}" method="POST" target="_blank">
+      <div>
+        <span>EdDSA public key</span>
+        <input type="text" name="ed_public_key">
+      </div>
+      <div>
+        <span>Script</span>
+        <textarea name="script"></textarea>
+      </div>
+      <div>
+        <span>Data</span>
+        <textarea name="data"></textarea>
+      </div>
+      <div>
+        <span>Keys</span>
+        <textarea name="keys"></textarea>
+      </div>
+      <div>
+        <span>Asset</span>
+        <textarea name="asset"></textarea>
+      </div>
+      <div>
+        <span>Metadata</span>
+        <textarea name="metadata"></textarea>
+      </div>
+      <input type="submit" value="Invia">
+    </form>
+  </body>
+</html>

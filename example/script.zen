@@ -1,0 +1,6 @@
+Scenario 'qp': Bob verifies the signature from Alice
+Given I have a 'dilithium public key' from 'Alice'
+Given that I have a 'string dictionary' named 'houses' inside 'asset'
+Given I have a 'dilithium signature' named 'dilithium signature' in 'output'
+When I verify the 'houses' has a dilithium signature in 'dilithium signature' by 'Alice'
+Then print the string 'ok'

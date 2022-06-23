@@ -20,8 +20,20 @@ def broadcast_tx(asset, metadata, ed_public_key, data, keys, script):
         zenData["result"] = metadata["data"]
     except:
         pass
+
+    def format_return(success, **kwargs):
+        return {
+            "success": success,
+            "data": zenData,
+            "keys": keys,
+            **kwargs
+        }
+
     zen_result = zencode_exec(script, data=json.dumps(zenData),
                                       keys=json.dumps(keys))
+
+    if not zen_result.output:
+        return format_return(False, error=zen_result.logs)
 
     zenroomscpt = ZenroomSha256(script=script, data=data, keys=keys)
     print(F'zenroom is: {zenroomscpt.script}')
@@ -72,7 +84,8 @@ def broadcast_tx(asset, metadata, ed_public_key, data, keys, script):
     )
 
     if not zenroomscpt.validate(message=message):
-        return { "success": False, "reason": "Validation failed on the server" }
+        return format_return(False,
+                error="Validation failed on the server")
 
     message = json.loads(message)
     fulfillment_uri_zen = zenroomscpt.serialize_uri()
@@ -93,4 +106,4 @@ def broadcast_tx(asset, metadata, ed_public_key, data, keys, script):
     # `https://example.com:9984`
     plntmnt = Planetmint("https://test.ipdb.io")
     sent_transfer_tx = plntmnt.transactions.send_commit(message)
-    return {"success": True, "txid": sent_transfer_tx['id'] }
+    return format_return(True, txid=sent_transfer_tx['id'])

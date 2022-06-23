@@ -1,0 +1,15 @@
+{
+  "data": {
+    "houses": [
+      {
+        "name": "Harry",
+        "team": "Gryffindor"
+      },
+      {
+        "name": "Draco",
+        "team": "Slytherin"
+      }
+    ],
+    "number": 6
+  }
+}

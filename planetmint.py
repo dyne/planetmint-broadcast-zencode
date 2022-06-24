@@ -2,9 +2,16 @@ import json
 import base58
 from hashlib import sha3_256
 from cryptoconditions.types.ed25519 import Ed25519Sha256
-from cryptoconditions.types.zenroom import ZenroomSha256
+from cryptoconditions import ZenroomSha256, Fulfillment
 from zenroom import zencode_exec
 from planetmint_driver import Planetmint
+
+
+class BytesEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, bytes):
+            return obj.decode('utf-8')
+        return json.JSONEncoder.default(self, obj)
 
 def broadcast_tx(asset, metadata, ed_public_key, data, keys, script):
     # Execute one time the script and capture the output
@@ -24,8 +31,10 @@ def broadcast_tx(asset, metadata, ed_public_key, data, keys, script):
     def format_return(success, **kwargs):
         return {
             "success": success,
-            "data": zenData,
-            "keys": keys,
+            "zenroom": {
+                "data": zenData,
+                "keys": keys,
+            },
             **kwargs
         }
 
@@ -36,10 +45,8 @@ def broadcast_tx(asset, metadata, ed_public_key, data, keys, script):
         return format_return(False, error=zen_result.logs)
 
     zenroomscpt = ZenroomSha256(script=script, data=data, keys=keys)
-    print(F'zenroom is: {zenroomscpt.script}')
     # CRYPTO-CONDITIONS: generate the condition uri
     condition_uri_zen = zenroomscpt.condition.serialize_uri()
-    print(F'\nzenroom condition URI: {condition_uri_zen}')
 
     # CRYPTO-CONDITIONS: construct an unsigned fulfillment dictionary
     unsigned_fulfillment_dict_zen = {
@@ -106,4 +113,17 @@ def broadcast_tx(asset, metadata, ed_public_key, data, keys, script):
     # `https://example.com:9984`
     plntmnt = Planetmint("https://test.ipdb.io")
     sent_transfer_tx = plntmnt.transactions.send_commit(message)
-    return format_return(True, txid=sent_transfer_tx['id'])
+
+    # decode fulfillment and put it into the result
+    ff = Fulfillment.from_uri(fulfillment_uri_zen)
+    ff_encoded = json.loads(json.dumps(ff.asn1_dict, cls=BytesEncoder))
+
+    # In a zenroom cryptocondition try to decode keys and data into dict
+    try:
+        for k,v in ff_encoded["zenroomSha256"].items():
+            if k == "keys" or k == "data":
+                ff_encoded["zenroomSha256"][k] = json.loads(v)
+    except:
+        pass
+    return format_return(True, tx=sent_transfer_tx,
+            zenroom_fulfillment=ff_encoded)

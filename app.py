@@ -20,6 +20,25 @@ def broadcast_tx_route():
                 "error": "{}: {}".format(type(e),
                                          str(e))}
 
+@app.route("/broadcast-json", methods=["POST"])
+def broadcast_tx_route_json():
+    ins = request.get_json(force=True)
+    if not ins["ed_public_key"]:
+        return {"success": False, "error": "Missing EdDSA public key"}
+    try:
+        return broadcast_tx(
+                ins.get("asset", "{}") or {},
+                ins.get("metadata", None) or {"data": {}},
+                ins.get("ed_public_key"),
+                ins.get("data", "{}") or {},
+                ins.get("keys", "{}") or {},
+                ins.get("script"),
+        )
+    except Exception as e:
+        return {"success": False,
+                "error": "{}: {}".format(type(e),
+                                         str(e))}
+
 @app.route('/')
 def index():
     return render_template('index.html')

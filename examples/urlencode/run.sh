@@ -1,0 +1,1 @@
+curl -X POST zenswarm.zenroom.org:26000/broadcast --data-urlencode "data@data.json" --data-urlencode "keys@keys.json" --data-urlencode "script@script.zen" --data-urlencode "asset@asset.json" --data-urlencode "ed_public_key=5Uv4KLinWJpKFagfab9r3P9jMRJhWMZv3CgRdBZZ4vvb" --data-urlencode "metadata@metadata.json"

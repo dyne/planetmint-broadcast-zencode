@@ -54,7 +54,7 @@ def broadcast_tx(asset, metadata, ed_public_key, data, keys, script):
         'public_key': base58.b58encode(ed_public_key).decode(),
     }
     output = {
-        'amount': '10',
+        'amount': '1',
         'condition': {
             'details': unsigned_fulfillment_dict_zen,
             'uri': condition_uri_zen,
